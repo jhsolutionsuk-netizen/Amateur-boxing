@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useFetch } from '../../hooks/useFetch'
 import { useAuth } from '../../hooks/useAuth'
 import GymMap from './GymMap'
@@ -36,6 +37,7 @@ function SearchIcon() {
 
 export default function GymDirectory() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const { data: gyms, loading, error } = useFetch('/gyms')
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -138,11 +140,15 @@ export default function GymDirectory() {
                 key={gym._id}
                 ref={el => { cardRefs.current[gym._id] = el }}
                 className={`gym-card${isNearby ? ' gym-card--nearby' : ''}${selectedId === gym._id ? ' gym-card--selected' : ''}`}
-                onClick={() => setSelectedId(gym._id)}
+                onClick={() => { setSelectedId(gym._id); navigate(`/gyms/${gym.slug || gym._id}`) }}
+                style={{ cursor: 'pointer' }}
               >
                 <div className="gym-card-header">
-                  <div className="gym-card-avatar">
-                    {gym.name.charAt(0).toUpperCase()}
+                  <div className="gym-card-avatar" style={gym.logo ? { background: '#fff', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' } : {}}>
+                    {gym.logo
+                      ? <img src={gym.logo} alt={gym.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px', boxSizing: 'border-box', display: 'block' }} />
+                      : gym.name.charAt(0).toUpperCase()
+                    }
                   </div>
                   <div className="gym-card-header-info">
                     <h3 className="gym-card-name">{gym.name}</h3>
@@ -164,12 +170,12 @@ export default function GymDirectory() {
                 {(gym.phone || gym.website) && (
                   <div className="gym-card-links">
                     {gym.phone && (
-                      <a href={`tel:${gym.phone}`} className="gym-card-link">
+                      <a href={`tel:${gym.phone}`} className="gym-card-link" onClick={e => e.stopPropagation()}>
                         <PhoneIcon /> {gym.phone}
                       </a>
                     )}
                     {gym.website && (
-                      <a href={gym.website} target="_blank" rel="noopener noreferrer" className="gym-card-link">
+                      <a href={gym.website} target="_blank" rel="noopener noreferrer" className="gym-card-link" onClick={e => e.stopPropagation()}>
                         <GlobeIcon /> Website
                       </a>
                     )}

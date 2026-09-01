@@ -66,11 +66,16 @@ export default function GymMap({ gyms, selectedId, onSelect }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <div style={{
                   width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                  background: gym.brandColor || '#0a2463',
+                  background: gym.logo ? '#fff' : (gym.brandColor || '#0a2463'),
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontWeight: 700, fontSize: 18,
+                  boxShadow: gym.logo ? '0 2px 10px rgba(0,0,0,0.12)' : 'none',
+                  overflow: 'hidden',
                 }}>
-                  {gym.name.charAt(0).toUpperCase()}
+                  {gym.logo
+                    ? <img src={gym.logo} alt={gym.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box', display: 'block' }} />
+                    : gym.name.charAt(0).toUpperCase()
+                  }
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.2, color: '#111' }}>

@@ -5,6 +5,7 @@ import { Server } from 'socket.io'
 import cors from 'cors'
 import jwt from 'jsonwebtoken'
 import path from 'path'
+import fs from 'fs'
 import { fileURLToPath } from 'url'
 import connectDB from './config/db.js'
 import Conversation from './models/Conversation.js'
@@ -59,6 +60,18 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/gyms', gymRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/notifications', notificationRoutes)
+
+app.get('/api/avatars', (req, res) => {
+  const dir = path.resolve(__dirname, '../client/public/avatars')
+  try {
+    const files = fs.readdirSync(dir)
+      .filter(f => /\.(png|jpg|jpeg|webp|svg|avif)$/i.test(f))
+      .map(f => `/avatars/${f}`)
+    res.json(files)
+  } catch {
+    res.json([])
+  }
+})
 
 // Socket.io — require valid JWT on connection
 io.use((socket, next) => {

@@ -32,7 +32,7 @@ const routes = [
   // ── App (with nav) ──
   { path: '/feed',                  element: <ProtectedRoute><Feed /></ProtectedRoute> },
   { path: '/account',               element: <ProtectedRoute><Account /></ProtectedRoute>,                                noNav: true },
-  { path: '/discover',              element: <ProtectedRoute><Discover /></ProtectedRoute>,                    noNav: true },
+  { path: '/discover',              element: <ProtectedRoute><Discover /></ProtectedRoute> },
   { path: '/fighters',              element: <ProtectedRoute><FighterList /></ProtectedRoute> },
   { path: '/fighters/directory',    element: <ProtectedRoute><FighterDirectory /></ProtectedRoute>,            noNav: true },
   { path: '/gyms',                  element: <ProtectedRoute><GymDirectory /></ProtectedRoute> },
