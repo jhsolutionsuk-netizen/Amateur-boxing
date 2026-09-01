@@ -47,17 +47,7 @@ function XIcon({ size = 14 }) {
 export default function FighterList() {
   const { data: fighters, loading, error } = useFetch('/fighters')
   const { user } = useAuth()
-  const { data: myFighter, error: myFighterError } = useFetch(user ? '/fighters/me' : null)
-
-  console.log('[YOU debug]', {
-    userRole: user?.role,
-    userId: user?._id,
-    userName: user?.name,
-    userUsername: user?.username,
-    myFighter: myFighter?._id,
-    myFighterError,
-    fighterUserIds: fighters?.map(f => ({ name: f.name, userId: f.user?._id }))
-  })
+  const { data: myFighter } = useFetch(user?.role === 'fighter' ? '/fighters/me' : null)
 
   const [search,      setSearch]      = useState('')
   const [gender,      setGender]      = useState('')
@@ -241,14 +231,11 @@ export default function FighterList() {
             const rank      = index + 1
             const location  = f.location || f.user?.location || f.stats?.nationality || '—'
             const isYou     = myFighter ? String(f._id) === String(myFighter._id) : false
-            const avatarUrl = isYou ? user.avatar : f.user?.avatar
+            const avatarUrl = isYou ? user?.avatar : f.user?.avatar
+            const to        = f.user?.username ? `/users/${f.user.username}` : null
 
-            return (
-              <Link
-                key={f._id}
-                to={`/fighters/${f._id}`}
-                className={`fighter-list-row${isYou ? ' is-you' : ''}`}
-              >
+            const row = (
+              <>
                 <span className={`fl-col-rank fl-rank-num${rank <= 3 ? ' top-three' : ''}`}>
                   #{rank}
                 </span>
@@ -275,8 +262,12 @@ export default function FighterList() {
                 <span className="fl-col-stat fl-stat-d">{draws}</span>
 
                 <span className="fl-col-location fl-location">{location}</span>
-              </Link>
+              </>
             )
+
+            return to
+              ? <Link key={f._id} to={to} className={`fighter-list-row${isYou ? ' is-you' : ''}`}>{row}</Link>
+              : <div  key={f._id}         className={`fighter-list-row${isYou ? ' is-you' : ''}`}>{row}</div>
           })}
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useFetch } from '../../hooks/useFetch'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -42,11 +42,8 @@ function GymCard({ gym }) {
 
 export default function Discover() {
   const { data: gymsRaw, loading: gymsLoading, error: gymsError } = useFetch('/gyms')
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const { user } = useAuth()
   const [gymSearch, setGymSearch] = useState('')
-
-  const handleLogout = () => { logout(); navigate('/welcome') }
 
   const filteredGyms = useMemo(() => {
     if (!gymsRaw) return []
@@ -63,7 +60,7 @@ export default function Discover() {
     <div className="discover-shell">
       <div className="discover-body">
 
-        {/* Top bar */}
+        {/* Search */}
         <div className="discover-filter-bar">
           <div className="filter-search-wrap" style={{ flex: 1 }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="filter-search-icon">
@@ -85,28 +82,6 @@ export default function Discover() {
               </button>
             )}
           </div>
-          {user && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <Link
-                to="/account"
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', background: '#fff', color: 'var(--text)', fontSize: 14, fontFamily: 'var(--sans)', fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}
-              >
-                <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--navy)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0, overflow: 'hidden' }}>
-                  {user.avatar
-                    ? <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                    : user.name.charAt(0).toUpperCase()
-                  }
-                </span>
-                <span style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                style={{ padding: '9px 18px', border: '1px solid var(--accent)', borderRadius: 'var(--r-sm)', background: '#fff', color: 'var(--accent)', fontSize: 14, fontFamily: 'var(--sans)', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Sign out
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Gyms section */}

@@ -197,13 +197,41 @@ export async function sendMessageNotificationEmail(recipient, sender, content) {
   const rawPreview = content
     ? (content.length > 180 ? content.slice(0, 180).trimEnd() + '…' : content)
     : null
-  const preview = rawPreview ? esc(rawPreview) : null
+  const preview  = rawPreview ? esc(rawPreview) : null
+  const initial  = esc((sender.name ?? '?').charAt(0).toUpperCase())
+  const hasAvatar = sender.avatar && !sender.avatar.startsWith('data:')
+  const avatarCell = hasAvatar
+    ? `<td style="width:52px;height:52px;border-radius:50%;overflow:hidden;vertical-align:middle;padding-right:16px;">
+         <img src="${esc(sender.avatar)}" alt="${esc(sender.name)}" width="52" height="52" style="display:block;border-radius:50%;width:52px;height:52px;object-fit:cover;">
+       </td>`
+    : `<td style="vertical-align:middle;padding-right:16px;">
+         <table width="52" cellpadding="0" cellspacing="0" role="presentation">
+           <tr><td style="width:52px;height:52px;background:${NAVY};border-radius:50%;text-align:center;vertical-align:middle;font-family:${FONT_BAR};font-size:24px;font-weight:700;color:${WHITE};">${initial}</td></tr>
+         </table>
+       </td>`
 
   const body = `
     <h1 style="margin:0 0 8px;font-family:${FONT_BAR};font-size:28px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:${NAVY};line-height:1.1;">New Message</h1>
-    <p style="margin:0 0 24px;font-family:${FONT_DM};font-size:15px;color:${TEXT_2};line-height:1.65;">
+    <p style="margin:0 0 20px;font-family:${FONT_DM};font-size:15px;color:${TEXT_2};line-height:1.65;">
       <strong style="color:${TEXT};font-weight:600;">${esc(sender.name)}</strong> sent you a message on ${APP}.
     </p>
+
+    <!-- Sender card -->
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:24px;">
+      <tr>
+        <td style="background:#f5f5f5;border:1px solid ${BORDER};border-radius:10px;padding:16px 20px;">
+          <table cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+              ${avatarCell}
+              <td style="vertical-align:middle;">
+                <p style="margin:0 0 2px;font-family:${FONT_DM};font-size:15px;font-weight:600;color:${TEXT};">${esc(sender.name)}</p>
+                ${sender.username ? `<p style="margin:0;font-family:${FONT_DM};font-size:13px;color:${TEXT_3};">@${esc(sender.username)}</p>` : ''}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
 
     ${preview ? `
     <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:28px;">
@@ -218,7 +246,7 @@ export async function sendMessageNotificationEmail(recipient, sender, content) {
     <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 28px;">
       <tr>
         <td style="background:${RED};border-radius:8px;padding:0;">
-          <a href="${clientUrl}/discover" style="display:inline-block;padding:13px 28px;font-family:${FONT_BAR};font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${WHITE};text-decoration:none;">Open ${APP}</a>
+          <a href="${clientUrl}/messages" style="display:inline-block;padding:13px 28px;font-family:${FONT_BAR};font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${WHITE};text-decoration:none;">Reply on ${APP}</a>
         </td>
       </tr>
     </table>
@@ -513,9 +541,20 @@ export async function sendFollowerNotificationEmail(recipient, follower) {
   const ROLE_LABEL = { fighter: 'Amateur Fighter', gym: 'Gym', fan: 'Fan' }
   const roleLabel  = ROLE_LABEL[follower.role] ?? 'Member'
 
+  const hasAvatar  = follower.avatar && !follower.avatar.startsWith('data:')
+  const avatarCell = hasAvatar
+    ? `<td style="width:52px;height:52px;border-radius:50%;overflow:hidden;vertical-align:middle;padding-right:16px;">
+         <img src="${esc(follower.avatar)}" alt="${esc(follower.name)}" width="52" height="52" style="display:block;border-radius:50%;width:52px;height:52px;object-fit:cover;">
+       </td>`
+    : `<td style="vertical-align:middle;padding-right:16px;">
+         <table width="52" cellpadding="0" cellspacing="0" role="presentation">
+           <tr><td style="width:52px;height:52px;background:${NAVY};border-radius:50%;text-align:center;vertical-align:middle;font-family:${FONT_BAR};font-size:24px;font-weight:700;color:${WHITE};">${initial}</td></tr>
+         </table>
+       </td>`
+
   const body = `
     <h1 style="margin:0 0 8px;font-family:${FONT_BAR};font-size:28px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:${NAVY};line-height:1.1;">New Follower</h1>
-    <p style="margin:0 0 24px;font-family:${FONT_DM};font-size:15px;color:${TEXT_2};line-height:1.65;">
+    <p style="margin:0 0 20px;font-family:${FONT_DM};font-size:15px;color:${TEXT_2};line-height:1.65;">
       <strong style="color:${TEXT};font-weight:600;">${esc(follower.name)}</strong> is now following you on ${APP}.
     </p>
 
@@ -525,13 +564,7 @@ export async function sendFollowerNotificationEmail(recipient, follower) {
         <td style="background:#f5f5f5;border:1px solid ${BORDER};border-radius:10px;padding:16px 20px;">
           <table cellpadding="0" cellspacing="0" role="presentation">
             <tr>
-              <td style="vertical-align:middle;padding-right:16px;">
-                <table width="48" cellpadding="0" cellspacing="0" role="presentation">
-                  <tr>
-                    <td style="width:48px;height:48px;background:${NAVY};border-radius:10px;text-align:center;vertical-align:middle;font-family:${FONT_BAR};font-size:22px;font-weight:700;color:${WHITE};">${initial}</td>
-                  </tr>
-                </table>
-              </td>
+              ${avatarCell}
               <td style="vertical-align:middle;">
                 <p style="margin:0 0 2px;font-family:${FONT_DM};font-size:15px;font-weight:600;color:${TEXT};">${esc(follower.name)}</p>
                 ${follower.username ? `<p style="margin:0 0 2px;font-family:${FONT_DM};font-size:13px;color:${TEXT_3};">@${esc(follower.username)}</p>` : ''}
